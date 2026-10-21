@@ -224,16 +224,17 @@ Three concrete reasons, specific to this tool:
 
 ## My Agent Session
 
-This project was built in one overnight session. An AI agent wrote the
-implementation; I made the calls — direction, which failures were
-acceptable, which numbers were honest enough to publish. The most
-valuable moment wasn't generated code: it was the deterministic engine
-passing a hand-check that a plain text search failed (the `req.params`
-sweep above). The least valuable was the first Gemma run, which failed
-quietly until the model's raw output was inspected and the failure
-became three concrete fixes. The full record of what was run, what
-broke, and where every number comes from is in the repo as
-`EVALUATION.md`. It's a better record than a chat transcript.
+What I actually did on this, start to finish: picked the problem, set
+the rule that generated data never gets trusted without a check, and
+read every run before believing its output. The moment that sold me on
+the design was the hand-check — a plain text search screamed that the
+real-world app used a removed API, and the engine's boundary matching
+showed it didn't (the `req.params` sweep above). The worst stretch was
+the first Gemma run: a clean failure, no usable output, and nothing in
+the logs said why — until I looked at the model's raw answers and
+found three separate format problems, each with a concrete fix. The
+full record of what was run, what broke, and where every number in
+this post comes from is in the repo as `EVALUATION.md`.
 
 ## Prize Categories
 
