@@ -206,8 +206,11 @@ Only categories genuinely used at submission time will be claimed:
   claimable.
 - **GitHub Copilot** (partner) — only if Copilot is genuinely used in
   the remaining build/write-up workflow and documented in the post.
-- **Render** (featured) — only if the demo is actually deployed on
-  Render (or a demo video is submitted instead).
+- **Render** (featured) — demo deployed 2026-10-21:
+  https://safe-to-upgrade-demo.onrender.com/ (live, verified);
+  claimable.
+- **Gemma** (featured) — Gemma 3 4B via Ollama extracted the Express
+  breaking-change entries live (Runs 4–6); claimable.
 
 ## Remaining
 
@@ -233,8 +236,9 @@ Only categories genuinely used at submission time will be claimed:
 - [x] Hand-check verdicts on a real open-source repo (Run 2 in
       `EVALUATION.md`: 39 packages, express SAFE, independent grep
       hand-check agreed). More repos would strengthen the table.
-- [ ] Render deploy of a small demo front end, or record a ~2-minute
-      demo video.
+- [x] Render deploy of the demo front end (2026-10-21):
+      https://safe-to-upgrade-demo.onrender.com/ — static site from
+      this repo, first deploy live in ~10s, verified HTTP 200.
 - [ ] DEV submission write-up (the judged artifact): what was built,
       how, the lazy payoff with real numbers, honest limits, and the
       open-innovation argument. Due Sun Oct 25, 2026, 11:59 PM PDT.

@@ -36,8 +36,9 @@ reward: the model does language work, tested code owns the facts.
 
 ## Demo
 
-[Demo link or ~2-minute video — pending: Render deploy of the report UI,
-or a screen recording of the CLI run below.]
+**Live demo: https://safe-to-upgrade-demo.onrender.com/** — the recorded
+runs below as a page (deployed on Render from this repo; the page states
+plainly that its data is recorded, not a live backend).
 
 What the demo shows, from a real run on the sample project:
 
@@ -165,7 +166,8 @@ Three concrete reasons, specific to this tool:
   searching your codebase for each one — carefully, because of traps like
   `req.param` vs `req.params`. Call it [measured estimate to confirm:
   ~30–45 minutes per package, done carefully].
-- The engine produces the same verdict table in under a second, with the
+- The engine triaged all 39 dependencies of a real-world Express app in
+  0.08 seconds (measured, and the verdicts reproduce exactly), with the
   evidence attached, and — the part that matters at 11pm — it produces
   the same answer every time you run it.
 - On the real-world run: 39 dependencies triaged in one command. One
@@ -187,7 +189,9 @@ Claim only what's genuinely used at submission time:
 - [x] Gemma — live run done 2026-10-21: Gemma 3 4B via Ollama (Colab
   T4) extracted 10 grounded entries from the Express 5 guide; verdict
   with model data matches the curated-data verdict (Runs 4–6).
-- [ ] Render — only if the demo is deployed there.
+- [x] Render — demo deployed 2026-10-21:
+  https://safe-to-upgrade-demo.onrender.com/ (static site from this
+  repo, live and verified).
 - [ ] GitHub Copilot — only if Copilot is genuinely part of the final
       build/demo workflow.
 - [ ] .tech Domain — only if the demo is live on a claimed .tech domain.

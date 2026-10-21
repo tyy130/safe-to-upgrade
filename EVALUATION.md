@@ -104,6 +104,8 @@ quoted in the DEV write-up; if a run is not listed, it did not happen.
 ## Write-up
 
 `WRITEUP.md` (drafted 2026-10-21) is the DEV submission draft built on the
-runs above. Remaining placeholders: the demo link (Render deploy), the
-agent-session link, and the per-package manual-time estimate. The Gemma
-live run, Browserbase live run, and public GitHub repo are done.
+runs above. Remaining placeholders: the agent-session link and the
+per-package manual-time estimate. The Gemma live run, Browserbase live
+run, public GitHub repo, and Render demo deploy
+(https://safe-to-upgrade-demo.onrender.com/, live 2026-10-21, verified
+HTTP 200) are done.
