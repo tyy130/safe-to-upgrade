@@ -1,9 +1,8 @@
-# DEV submission draft — Safe to Upgrade?
+# DEV submission — Safe to Upgrade?
 
-> Draft status: numbers below are from logged runs in `EVALUATION.md`.
-> Anything in [brackets] is not done yet and must be true before posting.
-> Prize categories are claimed only for technology genuinely used in the
-> final build — see the checklist at the bottom.
+> Submission text for the DEV post (posting package: `SUBMISSION.md`).
+> Every number below is from a logged run in `EVALUATION.md`. Prize
+> categories are claimed only for technology genuinely used.
 
 ## What I Built
 
@@ -29,6 +28,15 @@ answers it with evidence, not vibes:
    - **SAFE** — breaking-change data exists and none of its APIs are used.
    - **UNKNOWN** — no breaking-change data. The tool says so instead of
      guessing. A dependency tool that bluffs is worse than no tool.
+
+Dependabot and Renovate already automate the version bump — but a bump
+PR doesn't answer this question. They will happily open a PR that
+breaks you, or one you ignore for a year because checking it feels
+riskier than staying put. Safe to Upgrade? is the step *before* the
+bump: a triage verdict computed locally from the project's own
+migration guide — not a hosted service your codebase gets uploaded to,
+and not a model grading its own homework. Where the data doesn't
+exist, it says UNKNOWN and stops.
 
 The model proposes. The code disposes. If that split sounds familiar, it's
 because it's the architecture that keeps showing up in projects judges
@@ -164,8 +172,8 @@ Three concrete reasons, specific to this tool:
   Router v6 upgrade guide is comparable. Doing this by hand for one
   package means reading the guide, listing the removed APIs, and then
   searching your codebase for each one — carefully, because of traps like
-  `req.param` vs `req.params`. Call it [measured estimate to confirm:
-  ~30–45 minutes per package, done carefully].
+  `req.param` vs `req.params`. My estimate is ~30–45 minutes per
+  package, done carefully — an estimate, not a stopwatch number.
 - The engine triaged all 39 dependencies of a real-world Express app in
   0.08 seconds (measured, and the verdicts reproduce exactly), with the
   evidence attached, and — the part that matters at 11pm — it produces
@@ -177,8 +185,17 @@ Three concrete reasons, specific to this tool:
 
 ## My Agent Session
 
-[Link/embed the agent session — judges like seeing the build process;
-include the session where the req.params false-positive was caught.]
+This project was built in one overnight session with an AI agent
+writing the implementation while I made the calls — direction, which
+failures were acceptable, which numbers were honest enough to publish.
+The session's most valuable moment wasn't generated code: it was the
+deterministic engine surviving a hand-check that a naive text search
+failed (the `req.params` sweep above). Its least valuable was the
+first Gemma run, which failed silently until the model's raw output
+was inspected and the failure became three concrete fixes. The full
+record of what was run, what broke, and what every number is — is in
+the repo as `EVALUATION.md`. I'd rather point judges at that than at a
+chat transcript.
 
 ## Prize Categories
 
