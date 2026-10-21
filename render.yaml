@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: safe-to-upgrade-demo
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: demo
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+.env
+breaking_data.generated.json.tmp

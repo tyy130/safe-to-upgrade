@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Safe to Upgrade? — recorded demo runs</title>
+<style>
+  :root{
+    --ink:#1a2233; --muted:#5b6577; --line:#dfe3ea; --bg:#f6f7f9; --card:#fff;
+    --review:#b3261e; --review-bg:#fdecea;
+    --safe:#137333;   --safe-bg:#e6f4ea;
+    --unknown:#5f6368;--unknown-bg:#f1f3f4;
+    --accent:#1a56db;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:24px 16px 56px}
+  h1{font-size:1.7rem;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 18px;max-width:70ch}
+  .note{background:#fff8e1;border:1px solid #f0d48a;border-radius:8px;
+        padding:12px 14px;font-size:.92rem;margin:0 0 20px}
+  .note strong{color:#7a5b00}
+  .toggle{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0 0 14px;background:var(--card)}
+  .toggle button{appearance:none;border:0;background:transparent;padding:10px 16px;font-size:.95rem;
+                 cursor:pointer;color:var(--muted)}
+  .toggle button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:600}
+  .meta{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .meta code{background:#eceff3;border-radius:4px;padding:1px 5px;font-size:.85em}
+  .cards{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+        padding:10px 16px;min-width:120px;flex:1}
+  .card .n{font-size:1.5rem;font-weight:700;line-height:1.15}
+  .card .l{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .tablewrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:.93rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#fafbfc;color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+  tr:last-child td{border-bottom:0}
+  .pkg{font-weight:600}
+  .ver{color:var(--muted);font-weight:400;font-size:.88em}
+  .badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78rem;font-weight:700;letter-spacing:.02em}
+  .badge.REVIEW{background:var(--review-bg);color:var(--review)}
+  .badge.SAFE{background:var(--safe-bg);color:var(--safe)}
+  .badge.UNKNOWN{background:var(--unknown-bg);color:var(--unknown)}
+  tr.clickable{cursor:pointer}
+  tr.clickable:hover td{background:#fafbff}
+  .hint{color:var(--accent);font-size:.8rem;font-weight:600;white-space:nowrap}
+  .detail td{background:#fbfcfe}
+  .detail .reason{color:var(--muted);margin:0 0 8px}
+  .hit{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0 0 8px;background:#fff}
+  .hit .loc{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:700;font-size:.88rem}
+  .hit code{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+            background:#f4f5f7;border-radius:6px;padding:6px 8px;margin:6px 0;font-size:.85rem;overflow-x:auto;white-space:pre}
+  .hit .api{font-size:.88rem}
+  .hit a{color:var(--accent);word-break:break-all}
+  .legend{color:var(--muted);font-size:.88rem;margin:14px 2px 0}
+  footer{color:var(--muted);font-size:.85rem;margin-top:26px}
+  footer code{background:#eceff3;border-radius:4px;padding:1px 5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Safe to Upgrade? — recorded demo runs</h1>
+  <p class="sub">Safe to Upgrade? reads a repo's <code>package.json</code>, collects the breaking
+  changes for the target upgrade of each dependency, and deterministically searches the codebase
+  for real usage of the removed or renamed APIs. One verdict per package:
+  <strong>REVIEW</strong> (a breaking API is used, with file:line evidence),
+  <strong>SAFE</strong> (breaking-change data exists and none of its APIs are used), or
+  <strong>UNKNOWN</strong> (no breaking-change data — the tool says so instead of guessing).</p>
+
+  <p class="note"><strong>Recorded demo — not a live backend.</strong> Every table and count on
+  this page is the recorded output of a real run of <code>verdict.py</code>: the sample-project
+  run stored in <code>report.md</code> / <code>report.json</code> and the real-world run stored
+  in <code>realworld-report.md</code> / <code>realworld-report.json</code>, both logged in the
+  project's <code>EVALUATION.md</code>. The data is embedded in this page exactly as those files
+  recorded it; nothing here executes the tool in your browser.</p>
+
+  <div class="toggle" role="group" aria-label="Choose a recorded run">
+    <button id="btn-sample" aria-pressed="true">Sample project</button>
+    <button id="btn-realworld" aria-pressed="false">Real-world project</button>
+  </div>
+
+  <p class="meta" id="dataset-meta"></p>
+  <div class="cards" id="summary-cards"></div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Package</th>
+          <th>Upgrade checked</th>
+          <th>Verdict</th>
+          <th>Breaking APIs checked</th>
+          <th>Uses found</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="verdict-body"></tbody>
+    </table>
+  </div>
+
+  <p class="legend">Verdict meanings, as recorded in the run reports — REVIEW: “Breaking APIs are
+  used — manual review before upgrading.” SAFE: “Breaking-change data exists, none of its APIs are
+  used.” UNKNOWN: “No breaking-change data — not guessed.” Rows marked REVIEW can be clicked to
+  expand their file:line evidence; any row can be clicked to see the reason the run recorded.</p>
+
+  <footer>Source runs: <code>report.json</code> (sample project) and
+  <code>realworld-report.json</code> (gothinkster/node-express-realworld-example-app), produced by
+  <code>verdict.py</code> and logged in <code>EVALUATION.md</code>.</footer>
+</div>
+
+<script>
+"use strict";
+var SAMPLE = {
+ "repo": "/home/hatch/workspace/safe-to-upgrade/sample_repo",
+ "summary": {
+  "total": 3,
+  "REVIEW": 1,
+  "SAFE": 1,
+  "UNKNOWN": 1
+ },
+ "packages": [
+  {
+   "name": "express",
+   "declared_version": "^4.19.2",
+   "upgrade": {
+    "from": "4.x",
+    "to": "5.x",
+    "source": "https://expressjs.com/en/guide/migrating-5.html"
+   },
+   "changes_checked": 7,
+   "hits": [
+    {
+     "api": "res.sendfile",
+     "change": "removed",
+     "replacement": "res.sendFile",
+     "source": "https://expressjs.com/en/guide/migrating-5.html",
+     "file": "src/server.js",
+     "line": 34,
+     "text": "res.sendfile(path.join(__dirname, '..', 'public', 'manual.pdf'));"
+    }
+   ],
+   "verdict": "REVIEW",
+   "reason": "1 use(s) of removed/changed APIs found in the codebase."
+  },
+  {
+   "name": "lodash",
+   "declared_version": "^4.17.21",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "react-router-dom",
+   "declared_version": "^5.3.4",
+   "upgrade": {
+    "from": "5.x",
+    "to": "6.x",
+    "source": "https://reactrouter.com/6.30.1/upgrading/v5"
+   },
+   "changes_checked": 4,
+   "hits": [],
+   "verdict": "SAFE",
+   "reason": "None of the 4 known breaking APIs are used in the codebase."
+  }
+ ]
+};
+var REALWORLD = {
+ "repo": "/tmp/realworld-app",
+ "summary": {
+  "total": 39,
+  "REVIEW": 0,
+  "SAFE": 1,
+  "UNKNOWN": 38
+ },
+ "packages": [
+  {
+   "name": "@ngneat/falso",
+   "declared_version": "^7.1.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@nx/esbuild",
+   "declared_version": "17.2.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@nx/eslint",
+   "declared_version": "17.2.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@nx/eslint-plugin",
+   "declared_version": "17.2.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@nx/jest",
+   "declared_version": "17.2.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@nx/js",
+   "declared_version": "17.2.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@nx/node",
+   "declared_version": "17.2.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@nx/workspace",
+   "declared_version": "17.2.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@prisma/client",
+   "declared_version": "^4.16.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@swc-node/register",
+   "declared_version": "~1.6.7",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@swc/core",
+   "declared_version": "~1.3.85",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@types/bcryptjs",
+   "declared_version": "^2.4.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@types/cors",
+   "declared_version": "^2.8.17",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@types/express",
+   "declared_version": "~4.17.13",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@types/jest",
+   "declared_version": "^29.4.0",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@types/node",
+   "declared_version": "18.16.9",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@typescript-eslint/eslint-plugin",
+   "declared_version": "^6.9.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "@typescript-eslint/parser",
+   "declared_version": "^6.9.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "axios",
+   "declared_version": "^1.0.0",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "bcryptjs",
+   "declared_version": "^2.4.3",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "body-parser",
+   "declared_version": "^1.20.2",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "cors",
+   "declared_version": "^2.8.5",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "esbuild",
+   "declared_version": "^0.19.2",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "eslint",
+   "declared_version": "~8.48.0",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "eslint-config-prettier",
+   "declared_version": "^9.0.0",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "express",
+   "declared_version": "~4.18.1",
+   "upgrade": {
+    "from": "4.x",
+    "to": "5.x",
+    "source": "https://expressjs.com/en/guide/migrating-5.html"
+   },
+   "changes_checked": 7,
+   "hits": [],
+   "verdict": "SAFE",
+   "reason": "None of the 7 known breaking APIs are used in the codebase."
+  },
+  {
+   "name": "express-jwt",
+   "declared_version": "^8.4.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "jest",
+   "declared_version": "^29.4.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "jest-environment-node",
+   "declared_version": "^29.4.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "jest-mock-extended",
+   "declared_version": "^3.0.5",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "jsonwebtoken",
+   "declared_version": "^9.0.2",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "nx",
+   "declared_version": "17.2.6",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "prettier",
+   "declared_version": "^2.6.2",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "prisma",
+   "declared_version": "^4.16.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "slugify",
+   "declared_version": "^1.6.0",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "ts-jest",
+   "declared_version": "^29.1.0",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "ts-node",
+   "declared_version": "10.9.1",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "tslib",
+   "declared_version": "^2.3.0",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  },
+  {
+   "name": "typescript",
+   "declared_version": "~5.2.2",
+   "upgrade": null,
+   "changes_checked": 0,
+   "hits": [],
+   "verdict": "UNKNOWN",
+   "reason": "No breaking-change data for this package; verdict not guessed."
+  }
+ ]
+};
+
+var DATASETS = {
+  sample: {
+    data: SAMPLE,
+    label: "Sample project",
+    description: "Bundled sample project (sample_repo) — a small shop app still declaring Express 4 / React Router 5 era dependencies, plus lodash."
+  },
+  realworld: {
+    data: REALWORLD,
+    label: "Real-world project",
+    description: "gothinkster/node-express-realworld-example-app — a real open-source project with 39 dependencies (run logged in EVALUATION.md, 2026-10-21)."
+  }
+};
+
+var current = "sample";
+
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+function upgradeText(pkg) {
+  if (!pkg.upgrade) return "—";
+  return pkg.upgrade.from + " → " + pkg.upgrade.to;
+}
+
+function render(key) {
+  current = key;
+  var ds = DATASETS[key];
+  var data = ds.data;
+
+  document.getElementById("btn-sample").setAttribute("aria-pressed", key === "sample" ? "true" : "false");
+  document.getElementById("btn-realworld").setAttribute("aria-pressed", key === "realworld" ? "true" : "false");
+
+  var meta = document.getElementById("dataset-meta");
+  meta.textContent = "";
+  meta.appendChild(document.createTextNode(ds.description + " Recorded repo path: "));
+  var code = el("code", null, data.repo);
+  meta.appendChild(code);
+  meta.appendChild(document.createTextNode("."));
+
+  var cards = document.getElementById("summary-cards");
+  cards.textContent = "";
+  var items = [
+    ["Total packages", data.summary.total],
+    ["Review", data.summary.REVIEW],
+    ["Safe", data.summary.SAFE],
+    ["Unknown", data.summary.UNKNOWN]
+  ];
+  items.forEach(function (pair) {
+    var card = el("div", "card");
+    card.appendChild(el("div", "n", String(pair[1])));
+    card.appendChild(el("div", "l", pair[0]));
+    cards.appendChild(card);
+  });
+
+  var tbody = document.getElementById("verdict-body");
+  tbody.textContent = "";
+
+  data.packages.forEach(function (pkg) {
+    var tr = document.createElement("tr");
+    tr.className = "clickable";
+
+    var pkgTd = el("td");
+    var nameSpan = el("span", "pkg", pkg.name);
+    pkgTd.appendChild(nameSpan);
+    pkgTd.appendChild(document.createTextNode(" "));
+    pkgTd.appendChild(el("span", "ver", pkg.declared_version));
+    tr.appendChild(pkgTd);
+
+    tr.appendChild(el("td", null, upgradeText(pkg)));
+
+    var verdictTd = el("td");
+    verdictTd.appendChild(el("span", "badge " + pkg.verdict, pkg.verdict));
+    tr.appendChild(verdictTd);
+
+    tr.appendChild(el("td", null, String(pkg.changes_checked)));
+    tr.appendChild(el("td", null, String(pkg.hits.length)));
+    tr.appendChild(el("td", null, pkg.verdict === "REVIEW" ? "Evidence ▸" : "Reason ▸")).className = "";
+    tr.lastChild.className = "hint";
+
+    var detail = document.createElement("tr");
+    detail.className = "detail";
+    detail.style.display = "none";
+    var detailTd = document.createElement("td");
+    detailTd.colSpan = 6;
+    detailTd.appendChild(el("p", "reason", pkg.reason));
+
+    if (pkg.hits.length > 0) {
+      pkg.hits.forEach(function (hit) {
+        var box = el("div", "hit");
+        box.appendChild(el("div", "loc", hit.file + ":" + hit.line));
+        box.appendChild(el("code", null, hit.text));
+        var apiLine = el("div", "api");
+        var repl = hit.replacement ? " → use " + hit.replacement : "";
+        apiLine.appendChild(document.createTextNode(
+          "API " + hit.api + " (" + hit.change + repl + "); source: "));
+        var a = document.createElement("a");
+        a.href = hit.source;
+        a.textContent = hit.source;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        apiLine.appendChild(a);
+        box.appendChild(apiLine);
+        detailTd.appendChild(box);
+      });
+    } else if (pkg.upgrade && pkg.upgrade.source) {
+      var srcLine = el("div", "api");
+      srcLine.appendChild(document.createTextNode("Breaking-change source: "));
+      var sa = document.createElement("a");
+      sa.href = pkg.upgrade.source;
+      sa.textContent = pkg.upgrade.source;
+      sa.target = "_blank";
+      sa.rel = "noopener noreferrer";
+      srcLine.appendChild(sa);
+      detailTd.appendChild(srcLine);
+    }
+
+    detail.appendChild(detailTd);
+
+    tr.addEventListener("click", function () {
+      var open = detail.style.display !== "none";
+      detail.style.display = open ? "none" : "";
+      tr.cells[5].textContent = pkg.verdict === "REVIEW"
+        ? (open ? "Evidence ▸" : "Evidence ▾")
+        : (open ? "Reason ▸" : "Reason ▾");
+    });
+
+    tbody.appendChild(tr);
+    tbody.appendChild(detail);
+  });
+}
+
+document.getElementById("btn-sample").addEventListener("click", function () { render("sample"); });
+document.getElementById("btn-realworld").addEventListener("click", function () { render("realworld"); });
+render("sample");
+</script>
+</body>
+</html>

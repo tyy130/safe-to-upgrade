@@ -1,0 +1,1 @@
+{"dependencies":{"express":"^4.19.2","lodash":"^4.17.21","react-router-dom":"^5.3.4"},"description":"Fixture project for Safe to Upgrade? — a small shop app still on Express 4 / React Router 5 era dependencies.","main":"src/server.js","name":"sample-shop","private":true,"version":"1.0.0"}
