@@ -1,177 +1,72 @@
 {
   "packages": {
     "express": {
-      "from": "4.x",
-      "to": "5.x",
-      "source": "https://expressjs.com/en/guide/migrating-5.html",
+      "from": "4",
+      "to": "5",
+      "source": "https://expressjs.com/en/guide/migrating-5/",
       "changes": [
         {
           "api": "app.del",
           "change": "removed",
           "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"app.del()\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "app.param",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"app.param(fn)\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
+          "note": "Express 5 no longer supports the app.del() function.",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
         },
         {
           "api": "req.acceptsCharset",
           "change": "renamed",
           "kind": "renamed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"req.acceptsCharset() is replaced by req.acceptsCharsets().\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
+          "note": "Replaced by req.acceptsCharsets().",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
         },
         {
           "api": "req.acceptsEncoding",
           "change": "renamed",
           "kind": "renamed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"req.acceptsEncoding() is replaced by req.acceptsEncodings().\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
+          "note": "Replaced by req.acceptsEncodings().",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
         },
         {
           "api": "req.acceptsLanguage",
           "change": "renamed",
           "kind": "renamed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"req.acceptsLanguage() is replaced by req.acceptsLanguages().\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
+          "note": "Replaced by req.acceptsLanguages().",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
+        },
+        {
+          "api": "app.param",
+          "change": "changed",
+          "kind": "changed",
+          "note": "The app.param(name, fn) signature has been deprecated and no longer supported.",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
         },
         {
           "api": "req.param",
           "change": "removed",
           "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"req.param(name)\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "req.params",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"This potentially confusing and dangerous method of retrieving form data has been removed. You will now need to specifically look for the submitted parameter name in the req.params, req.body, or req...\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "req.body",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"This potentially confusing and dangerous method of retrieving form data has been removed. You will now need to specifically look for the submitted parameter name in the req.params, req.body, or req...\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "req.query",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"This potentially confusing and dangerous method of retrieving form data has been removed. You will now need to specifically look for the submitted parameter name in the req.params, req.body, or req...\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "res.status",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"Express 5 no longer supports the signature res.json(obj, status). Instead, set the status and then chain it to the res.json() method like this: res.status(status).json(obj).\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "res.jsonp",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"res.jsonp(obj, status)\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
+          "note": "The potentially confusing and dangerous method of retrieving form data has been removed.",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
         },
         {
           "api": "res.redirect",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"res.redirect(url, status)\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "res.location",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"res.redirect(\u2018back\u2019) and res.location(\u2018back\u2019)\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "app.get",
-          "change": "deprecated",
-          "kind": "deprecated",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"app.get('/user', (req, res) => {\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
+          "change": "changed",
+          "kind": "changed",
+          "note": "Now requires res.redirect(status, url).",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
         },
         {
           "api": "res.send",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"res.send(body, status)\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
+          "change": "changed",
+          "kind": "changed",
+          "note": "Now requires res.status(status).send(obj).",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
         },
         {
           "api": "res.sendfile",
-          "change": "renamed",
-          "kind": "renamed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"res.sendfile()\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "res.sendFile",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"res.sendFile() options\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "express.static",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"express.static() options\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "app.use",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"app.use(express.static('public', { dotfiles: 'allow' }));\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "router.param",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"router.param(fn)\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "express.static.mime",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"express.static.mime\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "express.urlencoded",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"app.use(express.urlencoded({ extended: true }));\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "app.router",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"app.router\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
-        },
-        {
-          "api": "req.query.page",
-          "change": "removed",
-          "kind": "removed",
-          "note": "Heuristic candidate (unverified): extracted from source line: \"req.query.page = 1;\"",
-          "source": "https://expressjs.com/en/guide/migrating-5.html"
+          "change": "replaced",
+          "kind": "replaced",
+          "note": "Replaced by res.sendFile().",
+          "source": "https://expressjs.com/en/guide/migrating-5/"
         }
       ]
     }

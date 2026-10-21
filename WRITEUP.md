@@ -22,7 +22,7 @@ answers it with evidence, not vibes:
    version you have and the version you'd move to (from the project's own
    migration guide or release notes).
 3. An open-weight model extracts the removed/renamed APIs from that guide
-   text. [Gemma live run — pending a host with Ollama]
+   text. (Live run: Gemma 3 4B via Ollama — Runs 4–6 in EVALUATION.md.)
 4. Deterministic code — never the model — searches your codebase for those
    exact APIs and issues one of three verdicts per package:
    - **REVIEW** — a removed API is used, with file:line evidence.
@@ -101,11 +101,18 @@ The extraction stage got the same honest treatment. On the real Express 5
 guide, the heuristic recovered **7 of 7** curated APIs — from **24
 candidates**. Some of the extra 17 are genuine signature changes the
 curated set omits; several are junk (`res.status`, example-code tokens).
-Fed into the verdict engine raw, the generated data flags 8 uses in the
+Fed into the verdict engine raw, the heuristic data flags 8 uses in the
 sample project where the curated data flags 1. Recall is easy; precision
-is the work. That's exactly the gap the grounded model pass is meant to
-close, and until it does, generated data is labelled "candidate —
-unverified" everywhere it appears.
+is the work.
+
+The grounded model pass closed that gap on this guide. Gemma 3 4B
+proposed 10 entries; the grounding check kept all 10 (each appears
+verbatim in the guide); after normalizing signature forms
+(`res.send(obj, status)` → `res.send`), the model data flags exactly
+**1 use** in the sample project — the same `res.sendfile` call the
+curated data flags. Generated data still isn't hand-verified the way
+the curated set is, so it stays labelled as generated wherever it
+appears.
 
 ## What went wrong
 
@@ -118,11 +125,19 @@ unverified" everywhere it appears.
   Express guide came back 301 — the Fetch API returned the redirect
   instead of following it to the trailing-slash URL. One more step the
   pipeline has to handle explicitly instead of discovering in production.
-- **The build VM can't run the model.** This environment has a few
-  hundred MB of free memory — not enough for Ollama plus Gemma. The model
-  extraction path is implemented and its output parsing is tested, but
-  its live run is still owed [pending], and I'm not going to pretend
-  otherwise in a post about a tool whose whole point is not bluffing.
+- **The build VM couldn't run the model — and the first live run failed
+  anyway.** This environment has a few hundred MB of free memory, so the
+  model run moved to a free Colab T4 GPU: Ollama + Gemma 3 4B, the real
+  script, the real guide. Run one produced no usable model output at all
+  ("no JSON array found in model output") and quietly fell back to the
+  heuristic. Instead of accepting that, I captured the model's raw
+  answers: it wraps JSON in markdown fences; under Ollama's JSON mode it
+  returns an object, not the array my parser demanded; and Ollama's
+  default 4096-token context truncates a guide-length prompt. Fixed all
+  three — JSON mode, `num_ctx: 32768`, a parser that accepts the shapes
+  a 4B model actually returns — and re-ran: **path used: model, 10
+  entries, 10 grounded, 0 dropped.** The failure is Run 4 in
+  EVALUATION.md; the fix is a commit, not a claim.
 
 ## Why Does Open Innovation Matter?
 
@@ -169,7 +184,9 @@ Claim only what's genuinely used at submission time:
 
 - [x] Browserbase — live run done 2026-10-21: real session created via
       the API and the Express guide fetched through the Fetch API.
-- [ ] Gemma — only after the model extraction path has a live run.
+- [x] Gemma — live run done 2026-10-21: Gemma 3 4B via Ollama (Colab
+  T4) extracted 10 grounded entries from the Express 5 guide; verdict
+  with model data matches the curated-data verdict (Runs 4–6).
 - [ ] Render — only if the demo is deployed there.
 - [ ] GitHub Copilot — only if Copilot is genuinely part of the final
       build/demo workflow.

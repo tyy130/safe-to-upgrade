@@ -131,10 +131,11 @@ Two proposal paths, one grounding check:
 There is no `ollama` binary on PATH, and
 `curl http://localhost:11434/api/tags` fails with connection refused
 (curl exit 7, HTTP 000); the script's own check reports
-`available=False (… [Errno 111] Connection refused)`. All live
-results below are therefore from the heuristic path; the model path
-is implemented and its output parsing is covered by the self-tests,
-but a live model run is still pending (see Remaining).
+`available=False (… [Errno 111] Connection refused)`. The heuristic
+live test below ran in this environment; the model path got its live
+run on a free Colab T4 GPU instead (Gemma 3 4B via Ollama: first
+attempt failed on output format, fixed, re-ran — 10 entries proposed,
+10 grounded, 7 of 7 curated APIs recovered; EVALUATION.md Runs 4–6).
 
 **Live test (2026-10-21): Express 5 migration guide.**
 Fetched https://expressjs.com/en/guide/migrating-5.html directly
@@ -218,10 +219,13 @@ Only categories genuinely used at submission time will be claimed:
       curated Express APIs (see "Extraction" above). Data for
       2 packages is hand-verified today; generated candidates still
       need a human verification pass before use.
-- [ ] Model path live run: Ollama is not available in this
-      environment (no binary; localhost:11434 connection refused),
-      so run the Ollama/Gemma path where a local server is available
-      and compare its recovery/precision against the heuristic run.
+- [x] Model path live run (2026-10-21, Colab T4, Gemma 3 4B via
+      Ollama): first attempt failed ("no JSON array found in model
+      output"); diagnosed (fences, wrapper object, 4096-token default
+      context), fixed, re-ran — model proposed 10 entries, grounding
+      kept 10, 7 of 7 curated APIs recovered; verdict on the sample
+      fixture with model data matches the curated-data verdict
+      (EVALUATION.md Runs 4–6).
 - [x] Browserbase live run (2026-10-21, through the registered
       connector): session created, Express guide fetched via the Fetch
       API, extraction re-run on the fetched content (7 of 7). Stagehand

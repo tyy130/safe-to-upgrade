@@ -394,6 +394,20 @@ def maybe_strip_html(text):
 
 # ---------------------------------------------------------------- output
 
+def normalize_api(api):
+    """Strip a trailing signature suffix from an extracted API name:
+    'res.send(obj, status)' -> 'res.send', 'app.del()' -> 'app.del'.
+
+    A live Gemma run returned APIs in signature form; the verdict
+    engine matches bare member accesses in source code, so generated
+    entries are stored normalized. Bare identifiers pass through.
+    """
+    api = api.strip()
+    if api.endswith(")") and "(" in api:
+        api = api[:api.index("(")].strip()
+    return api
+
+
 def merge_into_generated(out_path, package, from_version, to_version,
                          source_url, kept_entries):
     """Merge kept entries into the generated JSON file.
@@ -403,7 +417,8 @@ def merge_into_generated(out_path, package, from_version, to_version,
                            "changes": [{"api", "change", "kind",
                                         "note", "source"}, ...]}}}
     Existing entries for the same package are kept; new APIs are
-    appended; an API already present is not duplicated.
+    appended; an API already present (after normalization) is not
+    duplicated.
     Returns the number of entries actually added.
     """
     if os.path.exists(out_path):
@@ -419,19 +434,20 @@ def merge_into_generated(out_path, package, from_version, to_version,
     entry["to"] = to_version
     entry["source"] = source_url
     changes = entry.setdefault("changes", [])
-    known = {c.get("api") for c in changes}
+    known = {normalize_api(c.get("api", "")) for c in changes}
     added = 0
     for item in kept_entries:
-        if item["api"] in known:
+        api = normalize_api(item["api"])
+        if not api or api in known:
             continue
         changes.append({
-            "api": item["api"],
+            "api": api,
             "change": item["kind"],
             "kind": item["kind"],
             "note": item["note"],
             "source": source_url,
         })
-        known.add(item["api"])
+        known.add(api)
         added += 1
 
     with open(out_path, "w", encoding="utf-8") as fh:
@@ -496,6 +512,10 @@ def run_selftest():
         '{"apis": [{"api": "app.del", "kind": "removed"}]}')
     assert err is None and len(parsed) == 1, (parsed, err)
     assert parsed[0]["note"], parsed  # missing note is defaulted
+    # Signature-form APIs from the live run normalize to bare accesses.
+    assert normalize_api("res.send(obj, status)") == "res.send"
+    assert normalize_api("app.del()") == "app.del"
+    assert normalize_api("useHistory") == "useHistory"
 
     available, detail = check_ollama()
     print(f"selftest: heuristic extracted {sorted(apis)}")

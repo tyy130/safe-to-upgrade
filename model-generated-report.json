@@ -1,0 +1,52 @@
+{
+  "repo": "/home/hatch/workspace/safe-to-upgrade/sample_repo",
+  "summary": {
+    "total": 3,
+    "REVIEW": 1,
+    "SAFE": 0,
+    "UNKNOWN": 2
+  },
+  "packages": [
+    {
+      "name": "express",
+      "declared_version": "^4.19.2",
+      "upgrade": {
+        "from": "4",
+        "to": "5",
+        "source": "https://expressjs.com/en/guide/migrating-5/"
+      },
+      "changes_checked": 9,
+      "hits": [
+        {
+          "api": "res.sendfile",
+          "change": "replaced",
+          "replacement": null,
+          "source": "https://expressjs.com/en/guide/migrating-5/",
+          "file": "src/server.js",
+          "line": 34,
+          "text": "res.sendfile(path.join(__dirname, '..', 'public', 'manual.pdf'));"
+        }
+      ],
+      "verdict": "REVIEW",
+      "reason": "1 use(s) of removed/changed APIs found in the codebase."
+    },
+    {
+      "name": "lodash",
+      "declared_version": "^4.17.21",
+      "upgrade": null,
+      "changes_checked": 0,
+      "hits": [],
+      "verdict": "UNKNOWN",
+      "reason": "No breaking-change data for this package; verdict not guessed."
+    },
+    {
+      "name": "react-router-dom",
+      "declared_version": "^5.3.4",
+      "upgrade": null,
+      "changes_checked": 0,
+      "hits": [],
+      "verdict": "UNKNOWN",
+      "reason": "No breaking-change data for this package; verdict not guessed."
+    }
+  ]
+}
