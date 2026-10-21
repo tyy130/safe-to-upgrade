@@ -189,9 +189,12 @@ posting, at the author's request:
 
 ## Write-up
 
-`WRITEUP.md` (drafted 2026-10-21) is the DEV submission draft built on the
-runs above. Remaining placeholders: the agent-session link and the
-per-package manual-time estimate. The Gemma live run, Browserbase live
-run, public GitHub repo, and Render demo deploy
-(https://safe-to-upgrade-demo.onrender.com/, live 2026-10-21, verified
-HTTP 200) are done.
+`SUBMISSION.md` is the canonical submission text (it began as a
+separate `WRITEUP.md` draft; the duplicate was removed in the
+2026-10-21 cleanup so the repo carries one copy of the post — the same
+file that was verified byte-identical before publishing). The Gemma
+live run, Browserbase live run, public GitHub repo, and Render demo
+deploy (https://safe-to-upgrade-demo.onrender.com/, live 2026-10-21,
+verified HTTP 200) are done. `demo/DEMO_SCRIPT.md` was also removed in
+the cleanup: the video was never recorded; the live demo page replaced
+it.
