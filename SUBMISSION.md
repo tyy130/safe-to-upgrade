@@ -121,6 +121,47 @@ project — the same `res.sendfile` call the curated data flags. Generated
 data still isn't hand-verified the way the curated set is, so it stays
 labelled as generated wherever it appears.
 
+Then I ran the coverage pass the 38 UNKNOWNs were asking for:
+extraction on the guides and release notes of every package in that
+repo with a pending major — ESLint 9, Prisma 5, Prettier 3, Jest 30,
+bcryptjs 3, body-parser 2, Nx 18. (Run 7 in EVALUATION.md.)
+
+Two converted:
+
+- **ESLint 8→9: SAFE, on the API axis.** 11 candidates from the
+  official migration guide; the real ones are rule-API removals
+  (`sourceCode.getComments`, `context.getSource`). Grep confirms the
+  repo uses none of them. Its actual v9 risk is the `.eslintrc.json`
+  file v9 no longer reads — and a config file is not an API call. The
+  matcher can't see it, and the verdict doesn't claim to.
+- **Prettier 2→3: SAFE.** The real v3 removals are the `.sync` APIs
+  (`prettier.resolveConfig.sync` and friends) going async. The repo
+  never calls the Prettier API at all. Grep confirms.
+
+Two got rejected by inspection:
+
+- **Jest 30.** The extracted data claimed `jest.spyOn` was removed. It
+  wasn't — the Jest 30 post presents it as a feature (the new `using`
+  syntax). Bad data, thrown out.
+- **Prisma 5.** The candidates weren't Prisma Client APIs. And the repo
+  does use `PrismaClient` (`src/prisma/prisma-client.ts`), so the
+  engine's computed SAFE would have been a false all-clear on a package
+  with a real upgrade surface. Inspection caught it. That check exists
+  for exactly this.
+
+Three produced nothing: bcryptjs (the break is ESM module shape,
+described in prose), body-parser (behavior changes, prose), Nx
+(release notes are feature lists). No API tokens, no data, still
+UNKNOWN.
+
+Final state of that repo: **3 verdicts out of 39, 36 UNKNOWN.** The
+UNKNOWNs were never one problem. They split into no pending major
+(roughly half), changes shaped like config or prose that an API
+matcher can't judge, and extractable API removals — the only bucket
+this tool converts, and only when the extracted data survives
+inspection. Two of the four datasets produced in this pass wouldn't
+have.
+
 ## What went wrong
 
 - **GitHub Releases is not where changelogs live.** My first fetcher
@@ -176,9 +217,9 @@ Three concrete reasons, specific to this tool:
   well under a second (0.08s on the fastest run I measured; ~0.2s on a
   loaded machine — and the verdicts reproduce exactly), with the evidence
   attached. It produces the same answer every time you run it.
-- On the real-world run: 39 dependencies triaged in one command. One
-  verdict I could act on, 38 honest UNKNOWNs telling me exactly where the
-  remaining manual work actually is, instead of a vague feeling that
+- On the real-world run: 39 dependencies, one command. Three verdicts I
+  could act on after the coverage pass; 36 UNKNOWNs that show exactly
+  where the remaining manual work is, instead of a vague feeling that
   everything might be broken.
 
 ## My Agent Session
