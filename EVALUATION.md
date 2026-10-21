@@ -101,6 +101,65 @@ quoted in the DEV write-up; if a run is not listed, it did not happen.
   guide, the grounded model pass matched curated precision; the
   heuristic did not.
 
+## Run 7 — coverage pass on the real-world repo (2026-10-21)
+
+Question (from the author): the curated run left 38 of 39 packages
+UNKNOWN. Is the tool unreliable, or is the data just thin? Method: run
+the extraction pipeline (heuristic path; no local model available in
+this environment) on the migration guides / release notes of every
+package in the repo with a pending major upgrade, inspect the
+candidates by hand, re-run the verdict, hand-check the results.
+Data file: `breaking_data.run7.json`; report: `run7-report.json`.
+
+Starting point: 1 of 39 with a verdict (express SAFE). Ending point:
+**3 of 39 with trustworthy verdicts** (SAFE 3 / UNKNOWN 36).
+
+Converted:
+- **eslint 8→9 — SAFE (API axis).** 11 grounded candidates from the
+  official migration guide; the real ones are rule-API removals
+  (`sourceCode.getComments`, `context.getSource`,
+  `context.getAncestors`). Independent grep confirms zero uses — the
+  repo consumes ESLint through config, it doesn't write rules.
+  Caveat: this repo's actual ESLint 9 risk is its `.eslintrc.json`,
+  which v9 no longer supports. That risk is config-shaped; an API
+  matcher structurally cannot see it. SAFE here means "no removed
+  APIs used," nothing more.
+- **prettier 2→3 — SAFE (API axis).** 20 candidates; the real subset
+  is the removed `.sync` APIs (`prettier.resolveConfig.sync`,
+  `prettier.getFileInfo.sync`, `prettier.clearConfigCache`) — v3 made
+  the API async. Junk candidates (`foo`, `parsers.parse`) matched
+  nothing. Independent grep confirms the repo never calls the
+  Prettier API.
+
+Rejected on inspection (the human pass working as designed):
+- **jest 29→30.** Candidates included `jest.spyOn` tagged "removed."
+  It wasn't: the Jest 30 announcement presents spyOn as a feature
+  (the new `using` syntax). Plus a junk token (`goo.gl`). Data
+  rejected; jest stays UNKNOWN.
+- **prisma 4→5.** Candidates (`prismaService.enableShutdownHooks`,
+  `index.jsUsing`) are not Prisma Client APIs. The repo genuinely
+  uses `PrismaClient` (`src/prisma/prisma-client.ts`), so the
+  engine's computed SAFE would have been a false all-clear on a
+  package with a real upgrade surface. Inspection caught it; prisma
+  stays UNKNOWN.
+
+No data produced (extraction returned 0 grounded candidates):
+- **bcryptjs 2→3** — the breaking change is module shape (ESM by
+  default), described in prose; no API tokens to extract.
+- **body-parser 1→2** — breaking changes are behavior/defaults, in
+  prose.
+- **nx 17→18** — release notes are feature lists, no removal language
+  near API tokens.
+
+Finding: the 38 UNKNOWNs were never one problem. They split into
+(a) no pending major (roughly half the repo), (b) pending majors whose
+changes are config-shaped (ESLint's flat config) or prose-shaped
+(bcryptjs, body-parser), which an API matcher cannot judge, and
+(c) extractable API removals (ESLint rule APIs, Prettier `.sync`) —
+the only bucket this tool can honestly convert, and only with the
+inspection pass: two of the four datasets the pipeline produced this
+run would have issued wrong or empty verdicts without it.
+
 ## Verification pass (2026-10-21, pre-submission)
 
 Every number in the submission was reproduced from scratch before

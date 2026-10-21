@@ -1,0 +1,326 @@
+{
+  "packages": {
+    "express": {
+      "changes": [
+        {
+          "api": "app.del",
+          "change": "removed",
+          "note": "Express 5 no longer supports app.del(); an error is thrown. Use app.delete() for DELETE routes.",
+          "replacement": "app.delete",
+          "source": "https://expressjs.com/en/guide/migrating-5.html"
+        },
+        {
+          "api": "app.param",
+          "change": "removed signature",
+          "note": "Only the app.param(fn) signature (a single function argument, deprecated since v4.11.0) is removed in Express 5; app.param(name, fn) still exists. A text search cannot distinguish the two signatures, so any app.param use is flagged for review.",
+          "replacement": "app.param(name, fn) with a named parameter, or plain middleware",
+          "source": "https://expressjs.com/en/guide/migrating-5.html"
+        },
+        {
+          "api": "req.param",
+          "change": "removed",
+          "note": "req.param(name) was removed in Express 5; look the value up explicitly in req.params, req.query, or req.body.",
+          "replacement": "req.params, req.query, or req.body",
+          "source": "https://expressjs.com/en/guide/migrating-5.html"
+        },
+        {
+          "api": "res.sendfile",
+          "change": "removed",
+          "note": "The lowercase res.sendfile() was replaced by the camel-cased res.sendFile() in Express 5.",
+          "replacement": "res.sendFile",
+          "source": "https://expressjs.com/en/guide/migrating-5.html"
+        },
+        {
+          "api": "req.acceptsCharset",
+          "change": "renamed",
+          "note": "Method names were pluralized in Express 5; the singular req.acceptsCharset() is no longer supported.",
+          "replacement": "req.acceptsCharsets",
+          "source": "https://expressjs.com/en/guide/migrating-5.html"
+        },
+        {
+          "api": "req.acceptsEncoding",
+          "change": "renamed",
+          "note": "Method names were pluralized in Express 5; the singular req.acceptsEncoding() is no longer supported.",
+          "replacement": "req.acceptsEncodings",
+          "source": "https://expressjs.com/en/guide/migrating-5.html"
+        },
+        {
+          "api": "req.acceptsLanguage",
+          "change": "renamed",
+          "note": "Method names were pluralized in Express 5; the singular req.acceptsLanguage() is no longer supported.",
+          "replacement": "req.acceptsLanguages",
+          "source": "https://expressjs.com/en/guide/migrating-5.html"
+        }
+      ],
+      "from": "4.x",
+      "source": "https://expressjs.com/en/guide/migrating-5.html",
+      "to": "5.x"
+    },
+    "react-router-dom": {
+      "changes": [
+        {
+          "api": "Switch",
+          "change": "removed",
+          "note": "React Router v6 removed <Switch>; all <Switch> elements must be upgraded to <Routes>.",
+          "replacement": "Routes",
+          "source": "https://reactrouter.com/6.30.1/upgrading/v5"
+        },
+        {
+          "api": "Redirect",
+          "change": "removed",
+          "note": "React Router v6 removed <Redirect>; it becomes <Navigate> in v6.",
+          "replacement": "Navigate",
+          "source": "https://reactrouter.com/6.30.1/upgrading/v5"
+        },
+        {
+          "api": "useHistory",
+          "change": "removed",
+          "note": "React Router v6 removed useHistory; use useNavigate and its navigate() calls instead of history.push/replace/goBack.",
+          "replacement": "useNavigate",
+          "source": "https://reactrouter.com/6.30.1/upgrading/v5"
+        },
+        {
+          "api": "withRouter",
+          "change": "removed",
+          "note": "React Router v6 removed the withRouter higher-order component; use hooks to access router state instead.",
+          "replacement": "hooks (useNavigate, useParams, useLocation)",
+          "source": "https://reactrouter.com/6.30.1/upgrading/v5"
+        }
+      ],
+      "from": "5.x",
+      "source": "https://reactrouter.com/6.30.1/upgrading/v5",
+      "to": "6.x"
+    },
+    "eslint": {
+      "from": "8",
+      "to": "9",
+      "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0",
+      "changes": [
+        {
+          "api": "sourceCode.getComments",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"Removed sourceCode.getComments()\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "meta.schema",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"meta.schema is required for rules with options\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "eslint.config",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"Codemod: Use the @eslint/v8-to-v9-config codemod. It converts legacy string presets in existing eslint.config.* files and migrates eslintrc configs via FlatCompat + @eslint/js.\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "context.getSource",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"context.getSource()\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "sourceCode.getDeclaredVariables",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"sourceCode.getDeclaredVariables()\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "context.getAncestors",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"context.getAncestors()\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "context.getComments",
+          "change": "deprecated",
+          "kind": "deprecated",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"Codemod: Use the @eslint/v8-to-v9-custom-rules codemod. It converts both context.getComments() and sourceCode.getComments() to combinations of getCommentsBefore(), getCommentsInside(), and getComme...\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "sourceCode.getCommentsBefore",
+          "change": "deprecated",
+          "kind": "deprecated",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"To address: Replace with sourceCode.getCommentsBefore(), sourceCode.getCommentsAfter(), or sourceCode.getCommentsInside().\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "sourceCode.getCommentsAfter",
+          "change": "deprecated",
+          "kind": "deprecated",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"To address: Replace with sourceCode.getCommentsBefore(), sourceCode.getCommentsAfter(), or sourceCode.getCommentsInside().\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "sourceCode.getCommentsInside",
+          "change": "deprecated",
+          "kind": "deprecated",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"To address: Replace with sourceCode.getCommentsBefore(), sourceCode.getCommentsAfter(), or sourceCode.getCommentsInside().\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        },
+        {
+          "api": "context.report",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"Messages cannot have unsubstituted placeholders. The RuleTester now also checks if there are {{ placeholder }} still in the message as their values were not passed via data in the respective contex...\"",
+          "source": "https://eslint.org/docs/latest/use/migrate-to-9.0.0"
+        }
+      ]
+    },
+    "prettier": {
+      "from": "2",
+      "to": "3",
+      "source": "https://prettier.io/blog/2023/07/05/3.0.0.html",
+      "changes": [
+        {
+          "api": "js.flow",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"For historical reasons, Prettier used to recognize Flow syntax in JS files when the parser option was set to babel even if the file didn't include the @flow pragma. This support was limited and bad...\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.getSupportInfo",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"prettier.getSupportInfo() returns Promise\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.clearConfigCache",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"prettier.clearConfigCache() returns Promise<void>\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.resolveConfig.sync",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"prettier.resolveConfig.sync is removed\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.resolveConfigFile.sync",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"prettier.resolveConfigFile.sync is removed\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.getFileInfo.sync",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"prettier.getFileInfo.sync is removed\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "espree.mjs",
+          "change": "renamed",
+          "kind": "renamed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"esm/parser-espree.mjs -> plugins/acorn-and-espree.mjs\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettierPlugins.espree",
+          "change": "renamed",
+          "kind": "renamed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"global object renamed prettierPlugins.espree -> prettierPlugins.acorn\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettierPlugins.acorn",
+          "change": "renamed",
+          "kind": "renamed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"global object renamed prettierPlugins.espree -> prettierPlugins.acorn\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "flow.mjs",
+          "change": "renamed",
+          "kind": "renamed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"esm/parser-flow.mjs -> plugins/flow.mjs\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.doc",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"Update prettier.doc (#13203, #14456 by @fisker)\u200b\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.doc.builders.concat",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"prettier.doc.builders.concat was deprecated in v2.3.0, now it's removed.\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.doc.utils.getDocParts",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"prettier.doc.utils.getDocParts\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.doc.utils.propagateBreaks",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"prettier.doc.utils.propagateBreaks\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.doc.utils.stripTrailingHardline",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"Previously, in all core languages, after embedded code printed to Doc, we call prettier.doc.utils.stripTrailingHardline() to remove the trailing hard lines.\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "parsers.parse",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"The second argument parsers passed to parsers.parse has been removed (#13268 by @fisker)\u200b\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "options.resolveConfig",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"options.resolveConfig default to true now, see the documentation.\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "foo",
+          "change": "removed",
+          "kind": "removed",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"` foo bar baz `\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.util.isNextLineEmptyAfterIndex",
+          "change": "deprecated",
+          "kind": "deprecated",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"Deprecated prettier.util.isNextLineEmptyAfterIndex\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        },
+        {
+          "api": "prettier.util.isNextLineEmpty",
+          "change": "deprecated",
+          "kind": "deprecated",
+          "note": "Heuristic candidate (unverified): extracted from source line: \"Use prettier.util.isNextLineEmpty instead.\"",
+          "source": "https://prettier.io/blog/2023/07/05/3.0.0.html"
+        }
+      ]
+    }
+  }
+}
