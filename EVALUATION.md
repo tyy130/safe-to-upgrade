@@ -101,6 +101,33 @@ quoted in the DEV write-up; if a run is not listed, it did not happen.
   guide, the grounded model pass matched curated precision; the
   heuristic did not.
 
+## Verification pass (2026-10-21, pre-submission)
+
+Every number in the submission was reproduced from scratch before
+posting, at the author's request:
+
+- Both self-test suites pass.
+- Sample fixture + curated data: REVIEW 1 / SAFE 1 / UNKNOWN 1;
+  express 7 checked / 1 use (`res.sendfile`, `src/server.js:34`);
+  `app.delete` in the same file correctly not flagged.
+- Real-world repo at the recorded commit (`30b68e1`): 39 packages,
+  express SAFE (7 checked / 0 hits), 38 UNKNOWN; runtime 0.08–0.21s
+  across runs.
+- Heuristic regeneration on the Express guide: 24 candidates, 7 of 7
+  curated APIs recovered; sample verdict with that data: 24 checked /
+  8 uses.
+- Model data audit: raw Colab output 10 entries → 9 normalized;
+  7 of 7 curated APIs present in the model set; extras are
+  `res.redirect` and `res.send` (genuine signature changes).
+- Source audit: both guide URLs in `breaking_data.json` return 200;
+  the Browserbase fetch artifact is exactly 211,507 characters, as
+  the write-up states; repo is public with an MIT license; the Render
+  demo returns 200.
+- Two wording hardenings from an adversarial read: the Gemma category
+  line now states plainly that the live run executed on a Colab T4,
+  and the engine-timing claim now gives the measured range instead of
+  only the fastest number.
+
 ## Write-up
 
 `WRITEUP.md` (drafted 2026-10-21) is the DEV submission draft built on the

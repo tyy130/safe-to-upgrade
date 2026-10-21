@@ -180,7 +180,8 @@ Three concrete reasons, specific to this tool:
   `req.param` vs `req.params`. My estimate is ~30–45 minutes per
   package, done carefully — an estimate, not a stopwatch number.
 - The engine triaged all 39 dependencies of a real-world Express app in
-  0.08 seconds (measured, and the verdicts reproduce exactly), with the
+  well under a second (0.08s on the fastest run I measured; ~0.2s on a
+  loaded machine — and the verdicts reproduce exactly), with the
   evidence attached, and — the part that matters at 11pm — it produces
   the same answer every time you run it.
 - On the real-world run: 39 dependencies triaged in one command. One
@@ -209,8 +210,10 @@ I'm entering the categories this project genuinely used:
 - **Browserbase** — a real session was created through the API and the
   Express migration guide was fetched through the Browserbase Fetch API
   during the build (EVALUATION.md, Run 3).
-- **Gemma** — Gemma 3 4B (open weights, run locally via Ollama) is the
-  model in the extraction stage, with a full live run logged
-  (EVALUATION.md, Runs 4–6).
+- **Gemma** — Gemma 3 4B (open weights, via Ollama) is the model in
+  the extraction stage, with a full live run logged (EVALUATION.md,
+  Runs 4–6). The live run executed on a free Colab T4 because the build
+  VM couldn't host the model; the same script runs on local hardware
+  wherever Ollama does.
 - **Render** — the demo is deployed on Render:
   https://safe-to-upgrade-demo.onrender.com/
