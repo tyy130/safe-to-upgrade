@@ -82,16 +82,16 @@ def build_model_prompt(package, from_version, to_version, guide_text):
         f"Package: {package}, upgrade {from_version} -> {to_version}.\n"
         "From the guide text below, list every API that was removed, "
         "renamed, replaced, deprecated, or whose signature changed.\n"
-        "Respond with ONLY a JSON array. Each element must be an object "
-        'with exactly these string fields: "api" (the exact API '
-        'identifier as written in the guide, e.g. "res.sendfile" or '
-        '"useHistory"), "kind" (one of: removed, renamed, deprecated, '
-        'changed), and "note" (one short sentence, grounded in the '
-        "guide text).\n"
+        'Respond with ONLY a JSON object of the form {"changes": [...]}. '
+        'Each element of "changes" must be an object with these string '
+        'fields: "api" (the exact API identifier as written in the '
+        'guide, e.g. "res.sendfile" or "useHistory"), "kind" (one of: '
+        "removed, renamed, deprecated, changed), and \"note\" (one short "
+        "sentence, grounded in the guide text).\n"
         "Rules: extract ONLY APIs that literally appear in the guide "
         "text. Do not invent APIs. Do not include the replacement API "
         "as its own entry. No prose, no markdown fences, only the JSON "
-        "array.\n\n"
+        "object.\n\n"
         "GUIDE TEXT:\n"
         + guide_text[:MODEL_TEXT_LIMIT]
     )
@@ -100,20 +100,57 @@ def build_model_prompt(package, from_version, to_version, guide_text):
 def parse_model_output(raw):
     """Defensively parse the model's reply.
 
-    Returns (entries, error). On any failure: ([], "reason"). Extracts
-    the JSON array substring (first '[' to last ']'), validates each
-    item has non-empty string api/kind/note, drops invalid items.
+    Returns (entries, error). On any failure: ([], "reason").
+
+    A live Gemma 3 run (2026-10-21) showed the two shapes a 4B model
+    actually returns, so the parser accepts all of them:
+      - a bare JSON array of entry objects;
+      - a wrapper object holding the array under a key such as
+        "changes"/"apis"/"entries" (what Ollama's format:"json" mode
+        produces — it guarantees valid JSON, but an object, not an
+        array);
+      - either of the above wrapped in markdown code fences or
+        surrounded by prose (first '[' to last ']' fallback).
+    Each item needs non-empty string api/kind; a missing note is
+    defaulted, because the grounding check downstream — not the note —
+    is what keeps invented APIs out.
     """
     if raw is None:
         return [], "model returned no output"
-    start = raw.find("[")
-    end = raw.rfind("]")
-    if start == -1 or end == -1 or end < start:
-        return [], "no JSON array found in model output"
+    text = raw.strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+    parsed = None
     try:
-        parsed = json.loads(raw[start:end + 1])
-    except json.JSONDecodeError as exc:
-        return [], f"model output was not valid JSON: {exc}"
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        start = text.find("[")
+        end = text.rfind("]")
+        if start == -1 or end == -1 or end < start:
+            return [], "no JSON array found in model output"
+        try:
+            parsed = json.loads(text[start:end + 1])
+        except json.JSONDecodeError as exc:
+            return [], f"model output was not valid JSON: {exc}"
+    if isinstance(parsed, dict):
+        items = None
+        for key in ("changes", "apis", "entries", "results", "items"):
+            if isinstance(parsed.get(key), list):
+                items = parsed[key]
+                break
+        if items is None:
+            for value in parsed.values():
+                if isinstance(value, list):
+                    items = value
+                    break
+        if items is None:
+            return [], "model output object held no entry array"
+        parsed = items
     if not isinstance(parsed, list):
         return [], "model output JSON was not an array"
     entries = []
@@ -123,9 +160,10 @@ def parse_model_output(raw):
         api = item.get("api")
         kind = item.get("kind")
         note = item.get("note")
-        if not all(isinstance(v, str) and v.strip()
-                   for v in (api, kind, note)):
+        if not all(isinstance(v, str) and v.strip() for v in (api, kind)):
             continue
+        if not (isinstance(note, str) and note.strip()):
+            note = "Model-extracted entry (grounding-checked)."
         entries.append({"api": api.strip(), "kind": kind.strip(),
                         "note": note.strip()})
     return entries, None
@@ -140,7 +178,13 @@ def extract_with_model(package, from_version, to_version, guide_text,
         "model": model,
         "prompt": prompt,
         "stream": False,
-        "options": {"temperature": 0},
+        # Ollama JSON mode: guarantees valid JSON (an object — the
+        # parser unwraps it). num_ctx matters: Ollama's 4096-token
+        # default truncates a guide-length prompt and the model then
+        # returns prose or a cut-off array — the first live run failed
+        # exactly that way ("no JSON array found in model output").
+        "format": "json",
+        "options": {"temperature": 0, "num_ctx": 32768},
     }).encode("utf-8")
     request = urllib.request.Request(
         OLLAMA_BASE + "/api/generate", data=payload,
@@ -442,6 +486,16 @@ def run_selftest():
     assert parsed[0]["api"] == "app.del", parsed
     parsed, err = parse_model_output("no json here")
     assert parsed == [] and err, (parsed, err)
+    # The two shapes a live Gemma 3 run actually returned (2026-10-21):
+    # a fenced bare array, and a format:"json" wrapper object.
+    parsed, err = parse_model_output(
+        '```json\n[{"api": "app.del", "kind": "removed",'
+        ' "note": "gone"}]\n```')
+    assert err is None and len(parsed) == 1, (parsed, err)
+    parsed, err = parse_model_output(
+        '{"apis": [{"api": "app.del", "kind": "removed"}]}')
+    assert err is None and len(parsed) == 1, (parsed, err)
+    assert parsed[0]["note"], parsed  # missing note is defaulted
 
     available, detail = check_ollama()
     print(f"selftest: heuristic extracted {sorted(apis)}")

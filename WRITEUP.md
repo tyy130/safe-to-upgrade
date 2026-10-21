@@ -49,7 +49,7 @@ What the demo shows, from a real run on the sample project:
 
 ## Code
 
-[GitHub repo embed — pending: publish this project to a public repo.]
+{% github https://github.com/tyy130/safe-to-upgrade %}
 
 ## How I Built It
 
